@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="text_size_detail_title">20sp</dimen>
+    <dimen name="text_size_detail_release_date">16sp</dimen>
+    <dimen name="text_size_detail_vote_average">16sp</dimen>
+    <dimen name="text_size_detail_overview">22sp</dimen>
+
+    <dimen name="layout_margin_8">8dp</dimen>
+    <dimen name="layout_margin_16">16dp</dimen>
+    <dimen name="height_list_item">280dp</dimen>
+</resources>

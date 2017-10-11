@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">天天电影</string>
+    <string name="action_popular">Popular Movies</string>
+    <string name="action_top_rated">Top Rated Movies</string>
+    <string name="fail_load">Failed to load, Please try again</string>
+    <string name="share_title">天天电影的分享</string>
+    <string name="share_from">来自天天电影的分享：</string>
+    <string name="share_release_date">，上映日期：</string>
+    <string name="share_overview">，简介：</string>
+    <string name="loader_popular">popular</string>
+    <string name="loader_top_rated">top_rated</string>
+
+    <string-array name="sort_order">
+        <item>Popular Movies</item>
+        <item>Top Rated Movies</item>
+    </string-array>
+</resources>

@@ -7,6 +7,7 @@ import java.util.List;
 
 /**
  * Created by paul on 10/8/17.
+ * 实现parceable接口的movie类，支持放到fragment的args里
  */
 
 public class Movie implements Parcelable{

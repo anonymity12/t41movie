@@ -18,7 +18,7 @@ import com.paul.t41popmovies.network.okhttp.NetworkUtil;
 import com.squareup.picasso.Picasso;
 
 /**
- * Created by Administrator on 2017/9/12 0012.
+ *
  *
  * 细节Fragment，进行电影细节的显示，选择性加载，lazyLoad+缓存机制。
  */

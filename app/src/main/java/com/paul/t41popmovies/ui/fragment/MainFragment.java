@@ -11,6 +11,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -28,6 +29,7 @@ import com.paul.t41popmovies.db.MovieLab;
 import com.paul.t41popmovies.network.okhttp.NetworkUtil;
 import com.paul.t41popmovies.ui.activity.DetailPagerActivity;
 import com.paul.t41popmovies.ui.adapter.MainAdapter;
+import com.paul.t41popmovies.ui.view.SpacesItemDecoration;
 import com.paul.t41popmovies.util.MainLoader;
 
 import java.util.List;
@@ -51,6 +53,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
         //想让Fragment中的onCreateOptionsMenu生效必须先调用setHasOptionsMenu方法
+        //如果不调用这个方法，则在toolbar不显示菜单
         setHasOptionsMenu(true);
     }
 
@@ -66,11 +69,14 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         mMainRefresh.setOnRefreshListener(this);
 
         mMainRecyclerView = (RecyclerView) view.findViewById(R.id.rcv_main);
-        LinearLayoutManager layoutManager = new GridLayoutManager(getContext(), 2);
+        StaggeredGridLayoutManager layoutManager = new StaggeredGridLayoutManager(3,StaggeredGridLayoutManager.VERTICAL);
         mMainRecyclerView.setLayoutManager(layoutManager);
         mMainRecyclerView.setHasFixedSize(true);
         mMainAdapter = new MainAdapter(view.getContext(), this);
         mMainRecyclerView.setAdapter(mMainAdapter);
+        //set space for each item
+        SpacesItemDecoration decoration = new SpacesItemDecoration(29);
+        mMainRecyclerView.addItemDecoration(decoration);
 
         initData();
         return view;
@@ -174,13 +180,12 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     //接口编程的。
     @Override
     public void onListItemClick(int clickedItemIndex) {
-        //单页面，tt已删除DetailActivity
-        //Intent intent = DetailActivity.newIntent(getContext(), mMovieList.get(clickedItemIndex));
+
         Intent intent = DetailPagerActivity.newIntent(getContext(), mMovieList.get(clickedItemIndex));
         startActivity(intent);
     }
 
-    //有个家伙调用了这个刷新
+    //有个家伙调用了这个刷新：SwipeRefreshLayout
     @Override
     public void onRefresh() {
         initData();

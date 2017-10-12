@@ -7,7 +7,7 @@ package com.paul.t41popmovies.ui.fragment;
 import android.support.v4.app.Fragment;
 
 /**
- * Created by Administrator on 2017/9/22 0022.
+ *
  * 抽象类，以用户意愿来选择性加载Fragment（lazyLoad）
  */
 

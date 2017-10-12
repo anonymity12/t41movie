@@ -6,21 +6,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Administrator on 2017/9/18 0018.
+ * 提供工厂
+ * MoviewLab提供的一个功能是：
+ *
+ * 在电影列表访问者之间，和各个电影之间形成桥梁
  */
 
-
-/*
-* MoviewLab提供的一个功能是：
-*
-* 在电影列表访问者之间，和各个电影之间形成桥梁
-* */
 public class MovieLab {
     private static MovieLab sMovieLab;
 
     private List<Movie> mMovieList;
 
-    //修改为private是preferred
+    //修改为private是 good
     private MovieLab(Context context) {
         mMovieList = new ArrayList<>();
     }
@@ -42,13 +39,4 @@ public class MovieLab {
 
     }
 
-    public Movie getMovie(int id) {
-        for (Movie movie :
-                mMovieList) {
-            if (movie.getId() == id) {
-                return movie;
-            }
-        }
-        return null;
-    }
 }

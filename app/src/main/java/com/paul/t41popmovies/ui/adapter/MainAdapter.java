@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.paul.t41popmovies.db.Movie;
 import com.paul.t41popmovies.R;
@@ -13,6 +14,7 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 /**
  * Created by paul on 10/8/17.
@@ -22,6 +24,7 @@ public class MainAdapter  extends RecyclerView.Adapter<MainAdapter.MainViewHolde
 
     private Context mContext;
     private List<Movie> mMovies = new ArrayList<>();
+    private int[] heights;
 
     final private ListItemClickListener mOnClickListener;
 
@@ -33,6 +36,7 @@ public class MainAdapter  extends RecyclerView.Adapter<MainAdapter.MainViewHolde
     public MainAdapter(Context context, ListItemClickListener listener) {
         mContext = context;
         mOnClickListener = listener;
+        this.heights = new int[]{400,450,500,350};
     }
 
     @Override
@@ -46,9 +50,15 @@ public class MainAdapter  extends RecyclerView.Adapter<MainAdapter.MainViewHolde
     @Override
     public void onBindViewHolder(MainViewHolder holder, int position) {
         Movie movie = mMovies.get(position);
+
+        ViewGroup.LayoutParams params = holder.mMainImageView.getLayoutParams();
+        params.height = heights[(int)(Math.random()*4)];
+        holder.mMainImageView.setLayoutParams(params);
         Picasso.with(mContext)
                 .load("http://image.tmdb.org/t/p/w185/" + movie.getPoster_path())
                 .into(holder.mMainImageView);
+        holder.mTextView.setText(movie.getTitle());
+
     }
 
     @Override
@@ -61,13 +71,26 @@ public class MainAdapter  extends RecyclerView.Adapter<MainAdapter.MainViewHolde
         notifyDataSetChanged();
     }
 
+
+    private void getRandomHeight(int size){//得到随机item的高度
+        heights = new int[]{};
+        for (int i = 0; i < size; i++) {
+            heights[i] = (int)(200+Math.random()*400);
+        }
+    }
+
+
+
     //主页面ViewHolder
     class MainViewHolder extends RecyclerView.ViewHolder  implements View.OnClickListener{
-        public ImageView mMainImageView;
+        ImageView mMainImageView;
+        TextView mTextView;
 
-        public MainViewHolder(View itemView) {
+        MainViewHolder(View itemView) {
             super(itemView);
             mMainImageView = (ImageView) itemView.findViewById(R.id.iv_main);
+            mTextView = (TextView) itemView.findViewById(R.id.tv_title);
+
             itemView.setOnClickListener(this);
         }
 

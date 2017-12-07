@@ -9,7 +9,7 @@ import android.provider.BaseColumns;
 
 
 // completed 2017/12/5 应该添加新的entry，以支持更多项目
-public class FavoriteMovieContract {
+public class MovieContract {
     public static final String AUTHORITY = "com.paul.t41popmovies";
     public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + AUTHORITY);
     public static final String PATH_MOVIE = "movies";
@@ -22,9 +22,10 @@ public class FavoriteMovieContract {
         public static final String COLUMN_NAME = "name";
         public static final String COLUMN_RELEASE_DATE = "release_date";
         public static final String COLUMN_POST_PATH = "post_path";
-        public static final String COLUMN_AVERAGE_VOTE = "average_vote";
+        public static final String COLUMN_VOTE_AVERAGE = "average_vote";
         public static final String COLUMN_OVERVIEW = "overview";
         public static final String COLUMN_FAVORITE = "favorite";
+        public static final String COLUMN_BACKDROP_PATH = "backdrop_path";
 
     }
 }

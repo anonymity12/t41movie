@@ -11,7 +11,7 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import static com.paul.t41popmovies.db.FavoriteMovieContract.MovieEntry.TABLE_NAME;
+import static com.paul.t41popmovies.db.MovieContract.MovieEntry.TABLE_NAME;
 
 /**
  * Created by Zheng-rt on 2017/11/19.
@@ -27,16 +27,16 @@ public class MovieContentProvider extends ContentProvider {
 
     public static UriMatcher buildUriMatcher(){
         UriMatcher uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
-        uriMatcher.addURI(FavoriteMovieContract.AUTHORITY, FavoriteMovieContract.PATH_MOVIE,MOVIES);
-        uriMatcher.addURI(FavoriteMovieContract.AUTHORITY, FavoriteMovieContract.PATH_MOVIE + "/#", MOVIES_WITH_ID);
+        uriMatcher.addURI(MovieContract.AUTHORITY, MovieContract.PATH_MOVIE,MOVIES);
+        uriMatcher.addURI(MovieContract.AUTHORITY, MovieContract.PATH_MOVIE + "/#", MOVIES_WITH_ID);
         return uriMatcher;
     }
-    private FavoriteMovieDbHelper favoriteMovieDbHelper;
+    private MovieDbHelper movieDbHelper;
     @NonNull
     @Override
     public boolean onCreate() {
         Context context = getContext();
-        favoriteMovieDbHelper = new FavoriteMovieDbHelper(context);
+        movieDbHelper = new MovieDbHelper(context);
         return true;
     }
 
@@ -44,7 +44,7 @@ public class MovieContentProvider extends ContentProvider {
     @Nullable
     @Override
     public Cursor query(@NonNull Uri uri, @Nullable String[] projection, @Nullable String selection, @Nullable String[] selectionArgs, @Nullable String sortOrder) {
-        final SQLiteDatabase db = favoriteMovieDbHelper.getReadableDatabase();
+        final SQLiteDatabase db = movieDbHelper.getReadableDatabase();
         int matcher = sUriMatcher.match(uri);
         Cursor retCursor;
         switch(matcher){
@@ -74,14 +74,14 @@ public class MovieContentProvider extends ContentProvider {
     @Nullable
     @Override
     public Uri insert(@NonNull Uri uri, @Nullable ContentValues values) {
-        final SQLiteDatabase db = favoriteMovieDbHelper.getReadableDatabase();
+        final SQLiteDatabase db = movieDbHelper.getReadableDatabase();
         int matcher = sUriMatcher.match(uri);
         Uri returnUri;
         switch(matcher){
             case MOVIES:
                 long id = db.insert(TABLE_NAME,null,values);
                 if (id > 0){
-                    returnUri = ContentUris.withAppendedId(FavoriteMovieContract.MovieEntry.CONTENT_URI, id);
+                    returnUri = ContentUris.withAppendedId(MovieContract.MovieEntry.CONTENT_URI, id);
                 }else{
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 }
@@ -93,9 +93,27 @@ public class MovieContentProvider extends ContentProvider {
         return returnUri;
     }
 
+    //ContentProvider封装的delete方法，虽然好像没有直接的调用（任何contentResolver的方法调用，用Ctrl + B 查看都会直接跳到官方上层源码），但是应该是某种代理的方式会委托到此方法吧。
     @Override
     public int delete(@NonNull Uri uri, @Nullable String selection, @Nullable String[] selectionArgs) {
-        return 0;
+        final SQLiteDatabase db = movieDbHelper.getWritableDatabase();
+        int numRowsDeleted;
+
+        if(null == selection) selection = "1";
+        switch(sUriMatcher.match(uri)){
+            case MOVIES:
+                numRowsDeleted = db.delete(MovieContract.MovieEntry.TABLE_NAME,
+                        selection,
+                        selectionArgs);
+                break;
+
+            default:
+                throw new UnsupportedOperationException("Unknown uri: " + uri);
+        }
+        if (numRowsDeleted != 0){
+            getContext().getContentResolver().notifyChange(uri,null);
+        }
+        return numRowsDeleted;
     }
 
     @Override

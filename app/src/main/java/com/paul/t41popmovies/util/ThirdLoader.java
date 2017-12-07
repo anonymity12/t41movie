@@ -5,7 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.util.Log;
 
-import com.paul.t41popmovies.db.FavoriteMovieContract;
+import com.paul.t41popmovies.db.MovieContract;
 import com.paul.t41popmovies.db.Movie;
 import com.paul.t41popmovies.db.MovieLab;
 import com.paul.t41popmovies.network.okhttp.NetworkUtil;
@@ -44,7 +44,7 @@ public class ThirdLoader extends AsyncTaskLoader<Void> {
     public Void loadInBackground() {
 
         try {
-            mFavoriteMovieData = getContext().getContentResolver().query(FavoriteMovieContract.MovieEntry.CONTENT_URI,
+            mFavoriteMovieData = getContext().getContentResolver().query(MovieContract.MovieEntry.CONTENT_URI,
                     null,
                     null,
                     null,
@@ -58,7 +58,7 @@ public class ThirdLoader extends AsyncTaskLoader<Void> {
         return null;
     }
     private void queryFromNetwork(Cursor favoriteMovieData){
-        int idIndex = favoriteMovieData.getColumnIndex(FavoriteMovieContract.MovieEntry.COLUMN_ID);
+        int idIndex = favoriteMovieData.getColumnIndex(MovieContract.MovieEntry.COLUMN_ID);
         favoriteMovieData.moveToFirst();
         List<Integer> movieIdList = new ArrayList<>();
         //添加所有contentProvider里的id 数据到一个list里

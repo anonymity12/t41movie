@@ -42,6 +42,10 @@ public class Movie implements Parcelable{
     private String trailer;
 
 
+
+    private byte favorite;
+
+
     private String[] reviews;
     private String original_language;
     private String original_title;
@@ -66,6 +70,7 @@ public class Movie implements Parcelable{
         parcel.writeDouble(popularity);
         parcel.writeString(poster_path);
         parcel.writeString(trailer);
+        parcel.writeByte(favorite);
         parcel.writeStringArray(reviews);
         parcel.writeString(original_language);
         parcel.writeString(original_title);
@@ -95,7 +100,8 @@ public class Movie implements Parcelable{
         title = in.readString();
         popularity = in.readDouble();
         poster_path = in.readString();
-        trailer = in.readString();
+        trailer = in.readString();//tt: 我记得trailer应该是String[] 但是现在仅仅是单个String，原因在于我不会把String数组放在parcel里；
+        favorite = in.readByte();
         original_language = in.readString();
         original_title = in.readString();
         backdrop_path = in.readString();
@@ -233,6 +239,14 @@ public class Movie implements Parcelable{
 
     public void setReviews(String[] reviews) {
         this.reviews = reviews;
+    }
+
+    public byte getFavorite() {
+        return favorite;
+    }
+
+    public void setFavorite(byte favorite) {
+        this.favorite = favorite;
     }
 
 }

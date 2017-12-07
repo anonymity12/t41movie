@@ -24,7 +24,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.paul.t41popmovies.R;
-import com.paul.t41popmovies.db.FavoriteMovieContract;
+import com.paul.t41popmovies.db.MovieContract;
 import com.paul.t41popmovies.db.Movie;
 import com.paul.t41popmovies.db.ReviewsLab;
 import com.paul.t41popmovies.network.okhttp.NetworkUtil;
@@ -184,11 +184,11 @@ public class DetailFragment extends LazyLoadFragment implements LoaderManager.Lo
                 //2017/11/19 后台数据库以及cp已经准备好，在这里开始收藏功能
                 if(movieId == 0) return;
                 ContentValues cv = new ContentValues();
-                cv.put(FavoriteMovieContract.MovieEntry.COLUMN_ID, movieId);
-                cv.put(FavoriteMovieContract.MovieEntry.COLUMN_NAME, mMovie.getTitle());
-                cv.put(FavoriteMovieContract.MovieEntry.COLUMN_RELEASE_DATE, mMovie.getRelease_date());
-                cv.put(FavoriteMovieContract.MovieEntry.COLUMN_POST_PATH, mMovie.getBackdrop_path());
-                Uri uri = getContext().getContentResolver().insert(FavoriteMovieContract.MovieEntry.CONTENT_URI, cv);
+                cv.put(MovieContract.MovieEntry.COLUMN_ID, movieId);
+                cv.put(MovieContract.MovieEntry.COLUMN_NAME, mMovie.getTitle());
+                cv.put(MovieContract.MovieEntry.COLUMN_RELEASE_DATE, mMovie.getRelease_date());
+                cv.put(MovieContract.MovieEntry.COLUMN_POST_PATH, mMovie.getBackdrop_path());
+                Uri uri = getContext().getContentResolver().insert(MovieContract.MovieEntry.CONTENT_URI, cv);
                 if (uri != null){
                     Toast.makeText(getContext(),"Added to Favorite!",Toast.LENGTH_SHORT).show();
                 }

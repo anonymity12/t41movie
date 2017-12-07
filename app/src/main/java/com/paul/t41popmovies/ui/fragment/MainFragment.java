@@ -83,6 +83,12 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         return view;
     }
 
+    /*
+    *  2017/12/10 21:06 更新
+    *  希望，直接离线从数据库里（ContentProvider的方式）加载数据，（注：此时使用CursorLoader），
+    *  当SwipeRefreshLayout被下滑刷新后，进行一次网络请求（注：此时使用MainLoader加载流行和高分；使用ThirdLoader加载收藏；其实和阶段1.5一样。）
+    *  在这里值得考虑的细节是：
+    * */
     private void initData() {
         if (NetworkUtil.isNetworkAvailableAndConnected(getContext())) {
             showSuccessView();

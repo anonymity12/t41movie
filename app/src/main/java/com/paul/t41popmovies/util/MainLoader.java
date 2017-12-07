@@ -6,6 +6,7 @@ package com.paul.t41popmovies.util;
 
 import android.content.Context;
 import android.support.v4.content.AsyncTaskLoader;
+import android.util.Log;
 
 import com.paul.t41popmovies.db.Movie;
 import com.paul.t41popmovies.db.MovieLab;
@@ -15,14 +16,17 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by Administrator on 2017/9/16 0016.
  * Loader是一个值得注意的知识点
- *
+ * Loader里，最主要的部分就是 loadInBackground()
  * MainLoader是被MainFragment里initData()函数里的getLoaderManager找到的
+ * 根据传入的requestType去获得电影列表，后来也加入了为每一个电影请求留言的okHttp请求
+ * 我们会在这里使用到一个独立的movieLab，这个单例模式的movieLab将会为我们提供一个movieList
  *
  */
 
@@ -51,7 +55,17 @@ public class MainLoader extends AsyncTaskLoader<Void> {
         //用json数据实例化一个movielist
         MovieLab movieLab = MovieLab.get(getContext());
         movieLab.setMovieList(parseJSON(responseData));
-//        return movieLab.getMovieList();
+
+        //在上述setMovieList后，我们可以再读取movieList获得各个电影的id，然后就能依据这个id，来得到trailer
+        //得到trailer后再为对应的movie设置trailer
+        List<Movie> movies =  movieLab.getMovieList();
+        for(Movie movie : movies){
+            int id = movie.getId();
+            String jsonDataContainsTrailerKey = NetworkUtil.sendRequestForVideoWithOkHttp(id);
+            String trailerKeyValue = parseTrailerInJson(jsonDataContainsTrailerKey);
+            movie.setTrailer(trailerKeyValue);
+            /// 下一步需要填充recyclerView。。
+        }
         return null;
     }
 
@@ -78,4 +92,20 @@ public class MainLoader extends AsyncTaskLoader<Void> {
         }
         return movies;
     }
+    //parse the videos json result
+    private String parseTrailerInJson(String jsonDataContainsTrailerKey){
+        String trailerKeyValue = null;
+        try{
+            JSONObject jsonObject = new JSONObject(jsonDataContainsTrailerKey);
+            JSONArray jsonArray = jsonObject.getJSONArray("results");
+            //we only fetch on result in results
+            JSONObject videoObject = jsonArray.getJSONObject(0);
+            trailerKeyValue = videoObject.getString("key");
+            System.out.println("MainLoader >>>>>>>>>>>we got the key for trailer : " + trailerKeyValue);
+        }catch (JSONException e){
+            e.printStackTrace();
+        }
+        return  trailerKeyValue;
+    }
+
 }

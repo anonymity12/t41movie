@@ -61,9 +61,25 @@ public class DetailPagerActivity extends AppCompatActivity {
         initViewPager();
     }
 
+    //初始化伸展toolbar
+    //其实在这次初始化的时候，也进行了最大图的加载，
+    private void initCollapsingToolBar() {
+        setSupportActionBar(mToolbar);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
+        mCollapsingToolbarLayout.setTitleEnabled(true);
+        Picasso.with(this)
+                .load("http://image.tmdb.org/t/p/w780/" + mMovie.getBackdrop_path())
+                .into(mBackdropImageView);
+    }
+
     private void initViewPager() {
         mMovieList = MovieLab.get(this).getMovieList();
         FragmentManager fragmentManager = getSupportFragmentManager();
+
+        //设置简单的监听器
         mViewPager.setAdapter(new FragmentStatePagerAdapter(fragmentManager) {
             @Override
             public Fragment getItem(int position) {
@@ -85,6 +101,9 @@ public class DetailPagerActivity extends AppCompatActivity {
             }
 
             //当选中一个页面后，通过page的位置映射到movelist的对应位置，进行图片加载
+            //the reason why we need to load the image again, is that this image is separated with view pager,
+            //as each view pager will return the corresponding detail fragment, but will not change the above
+            // image in AppBarLayout(android.support.design.widget.AppBarLayout).(see activity_movie_pager.xml);
             @Override
             public void onPageSelected(int position) {
                 mMovie = mMovieList.get(position);
@@ -101,25 +120,13 @@ public class DetailPagerActivity extends AppCompatActivity {
 
         //以下的for循环作用是：ViewPager默认值显示PageAdapter中的第一个列表项
         //要显示列表项，可设置ViewPager当前要显示的列表项为movie数组中指定位置的列表项
+
         for (int i = 0; i < mMovieList.size(); i++) {
             if (mMovieList.get(i).getId() == mMovie.getId()) {
                 mViewPager.setCurrentItem(i);//i是一个指示器吗?恩，指示我们应该把当前item设置到哪个位置
                 break;
             }
         }
-    }
-
-    //初始化伸展toolbar
-    private void initCollapsingToolBar() {
-        setSupportActionBar(mToolbar);
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(true);
-        }
-        mCollapsingToolbarLayout.setTitleEnabled(true);
-        Picasso.with(this)
-                .load("http://image.tmdb.org/t/p/w780/" + mMovie.getBackdrop_path())
-                .into(mBackdropImageView);
     }
 
     @Override

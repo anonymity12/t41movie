@@ -31,6 +31,7 @@ import com.paul.t41popmovies.ui.activity.DetailPagerActivity;
 import com.paul.t41popmovies.ui.adapter.MainAdapter;
 import com.paul.t41popmovies.ui.view.SpacesItemDecoration;
 import com.paul.t41popmovies.util.MainLoader;
+import com.paul.t41popmovies.util.ThirdLoader;
 
 import java.util.List;
 
@@ -85,8 +86,9 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     private void initData() {
         if (NetworkUtil.isNetworkAvailableAndConnected(getContext())) {
             showSuccessView();
-            getLoaderManager().initLoader(0, null, this);//?
+            getLoaderManager().initLoader(0, null, this);//int id, Bundle args, Callback callback
         } else {
+            //在这里，如果没有网络，那么从本地的数据加载三种排序：1. 最流行表格，2. 最评分表格 3. 收藏表格
             showErrorView();
         }
     }
@@ -101,15 +103,16 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         mMainErrorTextView.setVisibility(View.VISIBLE);
     }
 
-    //利用i来进行两种方式的loading,这是创建过程
     @Override
     public Loader onCreateLoader(int i, Bundle args) {
         mMainRecyclerView.setVisibility(View.INVISIBLE);
         mMainLoading.setVisibility(View.VISIBLE);//ContentLoadingProgressBar
         if (i == 0) {
-            return new MainLoader(getContext(), getString(R.string.loader_popular));// AsyncTaskLoader<Void>??
+            return new MainLoader(getContext(), getString(R.string.loader_popular));// AsyncTaskLoader<Void>??yes, an AsyncTaskLoader would be called. @11.11
         } else if (i == 1) {
             return new MainLoader(getContext(), getString(R.string.loader_top_rated));
+        } else if ( i == 2) {
+            return new ThirdLoader(getContext());
         }
         return null;
     }
@@ -158,7 +161,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         });
         super.onCreateOptionsMenu(menu, inflater);
     }
-    //这是restartLoader（）；在最开始，创建Loader时有0和1两个loader；0是popular；1是top-reated
+    //这是restartLoader（）；在最开始，创建Loader时有0和1两个loader（后来添加了2）；0是popular；1是top-reated,2是ThirdLoader，载入收藏的电影。
     private void onSortOderChange(int i) {
         switch (i) {
             case 0:
@@ -166,6 +169,10 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
                 getLoaderManager().restartLoader(i, null, this);
                 break;
             case 1:
+                getLoaderManager().restartLoader(i, null, this);
+                break;
+            //here case 2 is to show the favorite movies
+            case 2:
                 getLoaderManager().restartLoader(i, null, this);
                 break;
         }

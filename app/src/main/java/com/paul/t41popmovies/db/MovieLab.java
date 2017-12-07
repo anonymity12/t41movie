@@ -9,7 +9,9 @@ import java.util.List;
  * 提供工厂
  * MoviewLab提供的一个功能是：
  *
- * 在电影列表访问者之间，和各个电影之间形成桥梁
+ * 在电影列表访问者之间，和电影列表之间形成桥梁
+ *
+ * movieLab构造方法里面有一个movieList，这就是lab的作用
  */
 
 public class MovieLab {

@@ -36,7 +36,8 @@ public class MainAdapter  extends RecyclerView.Adapter<MainAdapter.MainViewHolde
     public MainAdapter(Context context, ListItemClickListener listener) {
         mContext = context;
         mOnClickListener = listener;
-        this.heights = new int[]{400,450,500,350};
+        //取消随机高度，使App朴素点
+//        this.heights = new int[]{400,450,500,350};
     }
 
     @Override
@@ -50,10 +51,11 @@ public class MainAdapter  extends RecyclerView.Adapter<MainAdapter.MainViewHolde
     @Override
     public void onBindViewHolder(MainViewHolder holder, int position) {
         Movie movie = mMovies.get(position);
+//取消随机高度，使App朴素点
+//        ViewGroup.LayoutParams params = holder.mMainImageView.getLayoutParams();
+//        params.height = heights[(int)(Math.random()*4)];
+//        holder.mMainImageView.setLayoutParams(params);
 
-        ViewGroup.LayoutParams params = holder.mMainImageView.getLayoutParams();
-        params.height = heights[(int)(Math.random()*4)];
-        holder.mMainImageView.setLayoutParams(params);
         Picasso.with(mContext)
                 .load("http://image.tmdb.org/t/p/w185/" + movie.getPoster_path())
                 .into(holder.mMainImageView);
@@ -72,12 +74,6 @@ public class MainAdapter  extends RecyclerView.Adapter<MainAdapter.MainViewHolde
     }
 
 
-    private void getRandomHeight(int size){//得到随机item的高度
-        heights = new int[]{};
-        for (int i = 0; i < size; i++) {
-            heights[i] = (int)(200+Math.random()*400);
-        }
-    }
 
 
 

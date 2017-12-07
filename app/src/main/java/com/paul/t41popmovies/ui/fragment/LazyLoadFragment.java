@@ -23,6 +23,7 @@ public abstract class LazyLoadFragment extends Fragment {
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
 
+        //根据调用者set的可见性，get到这个可见性属性，
         if (getUserVisibleHint()) {
             isVisible = true;
             onVisible();
@@ -35,6 +36,7 @@ public abstract class LazyLoadFragment extends Fragment {
 
     /**
      * 可见
+     * then lazy load
      */
     protected void onVisible() {
         lazyLoad();
@@ -43,6 +45,7 @@ public abstract class LazyLoadFragment extends Fragment {
 
     /**
      * 不可见
+     * do nothing
      */
     protected void onInvisible() {
 

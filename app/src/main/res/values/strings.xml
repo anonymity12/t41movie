@@ -9,9 +9,11 @@
     <string name="share_overview">，简介：</string>
     <string name="loader_popular">popular</string>
     <string name="loader_top_rated">top_rated</string>
+    <string name="loader_favorite">favorite</string>
 
     <string-array name="sort_order">
         <item>Popular Movies</item>
         <item>Top Rated Movies</item>
+        <item>Favorite Movies</item>
     </string-array>
 </resources>

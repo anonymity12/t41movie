@@ -19,7 +19,9 @@ public class Movie implements Parcelable{
      * vote_average : 6.4
      * title : Minions
      * popularity : 1320.064017
-     * poster_path : /q0R4crx2SehcEEQEkYObktdeFy.jpg
+     * poster_path : /q0R4crx|2SehcEEQEkYObktdeFy.jpg
+     * trailer : SUXWAEX2jlg
+     * reviews :  "content": "\"Skarsgård goes to hell and ba.......
      * original_language : en
      * original_title : Minions
      * genre_ids : [10751,16,12,35]
@@ -35,10 +37,15 @@ public class Movie implements Parcelable{
     private double vote_average;
     private String title;
     private double popularity;
-    private String poster_path;
+    private String poster_path;//海报图
+
+    private String trailer;
+
+
+    private String[] reviews;
     private String original_language;
     private String original_title;
-    private String backdrop_path;
+    private String backdrop_path;//背景图
     private boolean adult;
     private String overview;
     private String release_date;
@@ -58,6 +65,8 @@ public class Movie implements Parcelable{
         parcel.writeString(title);
         parcel.writeDouble(popularity);
         parcel.writeString(poster_path);
+        parcel.writeString(trailer);
+        parcel.writeStringArray(reviews);
         parcel.writeString(original_language);
         parcel.writeString(original_title);
         parcel.writeString(backdrop_path);
@@ -86,6 +95,7 @@ public class Movie implements Parcelable{
         title = in.readString();
         popularity = in.readDouble();
         poster_path = in.readString();
+        trailer = in.readString();
         original_language = in.readString();
         original_title = in.readString();
         backdrop_path = in.readString();
@@ -207,6 +217,22 @@ public class Movie implements Parcelable{
 
     public void setGenre_ids(List<Integer> genre_ids) {
         this.genre_ids = genre_ids;
+    }
+
+    public String getTrailer() {
+        return trailer;
+    }
+
+    public void setTrailer(String trailer) {
+        this.trailer = trailer;
+    }
+
+    public String[] getReviews() {
+        return reviews;
+    }
+
+    public void setReviews(String[] reviews) {
+        this.reviews = reviews;
     }
 
 }

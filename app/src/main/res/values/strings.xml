@@ -7,9 +7,11 @@
     <string name="share_from">来自天天电影的分享：</string>
     <string name="share_release_date">，上映日期：</string>
     <string name="share_overview">，简介：</string>
-    <string name="loader_popular">popular</string>
-    <string name="loader_top_rated">top_rated</string>
-    <string name="loader_favorite">favorite</string>
+    <string name="loader_popular">pop</string>
+    <string name="loader_top_rated">vote</string>
+    <string name="loader_favorite">fav</string>
+    <string name="addtofavorite">AddToFavorite</string>
+    <string name="remove_from_favorite">NotFavorite</string>
 
     <string-array name="sort_order">
         <item>Popular Movies</item>

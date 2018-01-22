@@ -54,18 +54,23 @@ public class MainLoader extends AsyncTaskLoader<Void> {
 
         //用json数据实例化一个movielist
         MovieLab movieLab = MovieLab.get(getContext());
+        //解析json数据，将会返回cv数组(by parseJSON)，cv数组将会放入db(by syncMovies)；
         movieLab.syncMovies(parseJSON(responseData));//这里也要相应修改，不再使用movieList,已经使用ContentValues作为数据源进行数据库内部同步
+
+
+        /* 2017/12/11 11:04  以下方法弃用（待删除），我们的弥补是：在DetailFragment里单独为每个movie对象加载，而不是现在的全部加载*/
 
         //在上述setMovieList后，我们可以再读取movieList获得各个电影的id，然后就能依据这个id，来得到trailer
         //得到trailer后再为对应的movie设置trailer
-        List<Movie> movies =  movieLab.getMovieList();
+   /*   List<Movie> movies =  movieLab.getMovieList();
         for(Movie movie : movies){
             int id = movie.getId();
             String jsonDataContainsTrailerKey = NetworkUtil.sendRequestForVideoWithOkHttp(id);
             String trailerKeyValue = parseTrailerInJson(jsonDataContainsTrailerKey);
             movie.setTrailer(trailerKeyValue);
-            /// 下一步需要填充recyclerView。。
+            /// 下一步需要填充recyclerView。。评论
         }
+   */
         return null;
     }
 

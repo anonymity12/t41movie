@@ -26,6 +26,7 @@ import android.widget.TextView;
 import com.paul.t41popmovies.R;
 import com.paul.t41popmovies.db.Movie;
 import com.paul.t41popmovies.db.MovieLab;
+import com.paul.t41popmovies.db.MoviePreferences;
 import com.paul.t41popmovies.network.okhttp.NetworkUtil;
 import com.paul.t41popmovies.ui.activity.DetailPagerActivity;
 import com.paul.t41popmovies.ui.adapter.MainAdapter;
@@ -87,16 +88,19 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     *  2017/12/10 21:06 更新
     *  希望，直接离线从数据库里（ContentProvider的方式）加载数据，（注：此时使用CursorLoader），
     *  当SwipeRefreshLayout被下滑刷新后，进行一次网络请求（注：此时使用MainLoader加载流行和高分；使用ThirdLoader加载收藏；其实和阶段1.5一样。）
-    *  在这里值得考虑的细节是：
+    *  在这里值得考虑的细节是：如何做好离线模块和在线模块的分离
     * */
     private void initData() {
-        if (NetworkUtil.isNetworkAvailableAndConnected(getContext())) {
-            showSuccessView();
-            getLoaderManager().initLoader(0, null, this);//int id, Bundle args, Callback callback
-        } else {
-            //在这里，如果没有网络，那么从本地的数据加载三种排序：1. 最流行表格，2. 最评分表格 3. 收藏表格
-            showErrorView();
-        }
+        int prefer_loader_id = MoviePreferences.getPreferLoaderId(getContext());
+        getLoaderManager().initLoader(prefer_loader_id, null, this);
+
+//        if (NetworkUtil.isNetworkAvailableAndConnected(getContext())) {
+//            showSuccessView();
+//            getLoaderManager().initLoader(0, null, this);//int id, Bundle args, Callback callback
+//        } else {
+//            //在这里，如果没有网络，那么从本地的数据加载三种排序：1. 最流行表格，2. 最评分表格 3. 收藏表格
+//            showErrorView();
+//        }
     }
 
     private void showSuccessView() {
@@ -109,19 +113,37 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         mMainErrorTextView.setVisibility(View.VISIBLE);
     }
 
+    // 我们使用ThirdLoader来进行离线加载 三张表；
     @Override
-    public Loader onCreateLoader(int i, Bundle args) {
+    public Loader onCreateLoader(int loaderId, Bundle args) {
         mMainRecyclerView.setVisibility(View.INVISIBLE);
         mMainLoading.setVisibility(View.VISIBLE);//ContentLoadingProgressBar
+        switch (loaderId){
+            // 0 是载入流行，离线方式
+            case 0:
+                return new ThirdLoader(getContext(), getString(R.string.loader_popular));// AsyncTaskLoader<Void>??yes, an AsyncTaskLoader would be called. @11.11
+            // 1 是载入评分，离线方式
+            case 1:
+                return new ThirdLoader(getContext(), getString(R.string.loader_top_rated));
+            //break;注意：这里我们不需要break语句，因为break不可达，因为return在前面。
+            //2 是载入收藏，离线方式
+            case 2:
+                return new ThirdLoader(getContext(),getString(R.string.loader_favorite));
+
+
+        }
+/* 这里的if else是之前的残留， 我们采用新的switch方式进行loaderId的判断。如上所示。
         if (i == 0) {
+            return
             return new MainLoader(getContext(), getString(R.string.loader_popular));// AsyncTaskLoader<Void>??yes, an AsyncTaskLoader would be called. @11.11
         } else if (i == 1) {
             return new MainLoader(getContext(), getString(R.string.loader_top_rated));
         } else if ( i == 2) {
             return new ThirdLoader(getContext());
-        }
+        }*/
         return null;
     }
+
     //loading结束，我们用movielist是否为空来显示成功界面或者错误界面
     @Override
     public void onLoadFinished(Loader<Void> loader, Void data) {
@@ -191,6 +213,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
 
     //adapter里有一个ViewHolder，这个View的onClickListener会调用这个接口实现，可以说：我们的MainFragment是面向
     //接口编程的。
+    //建议更名：onViewHolderClick(...)
     @Override
     public void onListItemClick(int clickedItemIndex) {
 

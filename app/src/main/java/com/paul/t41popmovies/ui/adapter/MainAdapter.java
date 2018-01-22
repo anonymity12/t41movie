@@ -25,7 +25,7 @@ public class MainAdapter  extends RecyclerView.Adapter<MainAdapter.MainViewHolde
     private Context mContext;
     private List<Movie> mMovies = new ArrayList<>();
     private int[] heights;
-
+//final 是什么效果，请仔细思考，实现此接口的MainFragment类，将必然拥有这个不可更改的对象。
     final private ListItemClickListener mOnClickListener;
 
     public interface ListItemClickListener {

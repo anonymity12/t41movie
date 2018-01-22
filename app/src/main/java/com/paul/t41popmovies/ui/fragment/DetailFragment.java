@@ -6,6 +6,7 @@ package com.paul.t41popmovies.ui.fragment;
 
 import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -32,6 +33,8 @@ import com.paul.t41popmovies.ui.adapter.SecondaryAdapter;
 import com.paul.t41popmovies.util.SecondaryLoader;
 import com.squareup.picasso.Picasso;
 
+import static com.paul.t41popmovies.util.Parser.parseTrailerInJson;
+
 /**
  * 细节Fragment，进行电影细节的显示，选择性加载，lazyLoad+缓存机制。
  *
@@ -56,7 +59,7 @@ public class DetailFragment extends LazyLoadFragment implements LoaderManager.Lo
     private TextView mOverviewTextView;
     private TextView mDetailErrorTextView;
     private Button mTrailerButton;
-    private ImageButton mFavoriteButton;
+    private Button mFavoriteButton;
     private RecyclerView mReviewsRecyclerView;
     private String [] mReviewsList;
     private ContentLoadingProgressBar mReviewsLoading;
@@ -69,7 +72,7 @@ public class DetailFragment extends LazyLoadFragment implements LoaderManager.Lo
     //是否已被加载过一次，第二次就不再去请求数据了
     private boolean mHasLoadedOnce;
 
-    //外人调用
+    //外人（谁呢？）调用
     public static DetailFragment newInstance(Movie movie) {
         Bundle args = new Bundle();
         args.putParcelable(ARG_MOVIE, movie);
@@ -98,7 +101,8 @@ public class DetailFragment extends LazyLoadFragment implements LoaderManager.Lo
             mOverviewTextView = (TextView) mView.findViewById(R.id.tv_detail_overview);
             mDetailErrorTextView = (TextView) mView.findViewById(R.id.tv_detail_error);
             mTrailerButton = (Button) mView.findViewById(R.id.trailer_button);
-            mFavoriteButton = (ImageButton) mView.findViewById(R.id.favorite_button);
+            mTrailerButton.setVisibility(View.INVISIBLE);
+            mFavoriteButton = (Button) mView.findViewById(R.id.favorite_button);
             mReviewsRecyclerView = (RecyclerView) mView.findViewById(R.id.reviews_recycler_view);
             mReviewsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
             mReviewsLoading = (ContentLoadingProgressBar) mView.findViewById(R.id.pb_reviews_loading);
@@ -110,7 +114,7 @@ public class DetailFragment extends LazyLoadFragment implements LoaderManager.Lo
         }
         ViewGroup parent = (ViewGroup) mView.getParent();
         if (parent != null) {
-            parent.removeView(mView);
+            parent.removeView(mView);//parent大概就是DetailPagerActivity布局文件里的activity_movie_view_pager吧
         }
         return mView;
     }
@@ -151,11 +155,11 @@ public class DetailFragment extends LazyLoadFragment implements LoaderManager.Lo
             showErrorView();
         }
     }
-    //初始化细节
+    //初始化细节,这是在线方式下的 细节加载 ；在线加载网络图片和trailer，离线加载： 日期，评分，概述；
     private void initDetail() {
         //标题
         mTitleTextView.setText(mMovie.getTitle());
-        //图片
+        //图片 2017/12/14 11:50 Picasso应加载本地图片。
         Picasso.with(getContext())
                 .load("http://image.tmdb.org/t/p/w185/" + mMovie.getPoster_path())
                 .into(mPosterImageView);
@@ -164,7 +168,26 @@ public class DetailFragment extends LazyLoadFragment implements LoaderManager.Lo
         //其他信息：平均评分，概述
         mVoteAverageTextView.setText(String.format("%2.1f", mMovie.getVote_average()));
         mOverviewTextView.setText(mMovie.getOverview());
+        //为当前movie加载trailer信息。天天标记 2017/12/11 10:57
+        //我希望，以下的网络请求应不是异步的，就算OKHTTPS是开启了新的线程，也希望后面的button.setOnClickListener()能够
+        //等待网络请求，解析，movie对象的trailer字段设定完成。不然会看到点击button而没有trailer的bug。(i.e. 这里可能存在bug！）
+        final int id = mMovie.getId();
+        String jsonDataContainsTrailerKey = NetworkUtil.sendRequestForVideoWithOkHttp(id);
+        String trailerKeyValue = parseTrailerInJson(jsonDataContainsTrailerKey);
+        //following two lines aim to query the movie with id in FavTable.
+        Uri movieUri = Uri.parse(MovieContract.FavMovieEntry.CONTENT_URI +"/" + id);
+        Cursor movieCursor = getContext().getContentResolver().query(movieUri,null,null,null,null);
+        // 通过cursor读到的isFav值来设置按钮样式。
+        int isFav = 0;
+        if (movieCursor.moveToFirst()){
+            int isFavIndex = movieCursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_FAVORITE);
+            isFav = movieCursor.getInt(isFavIndex);
+        }
+        mFavoriteButton.setText(isFav == 1 ? R.string.remove_from_favorite : R.string.addtofavorite);
+
+        mMovie.setTrailer(trailerKeyValue);
         //设置YouTube url for the trailer button
+        mTrailerButton.setVisibility(View.VISIBLE);
         mTrailerButton.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -177,18 +200,15 @@ public class DetailFragment extends LazyLoadFragment implements LoaderManager.Lo
                 startActivity(intent);
             }
         });
+        final int finalIsFav = isFav;
         mFavoriteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int movieId = mMovie.getId();
-                //2017/11/19 后台数据库以及cp已经准备好，在这里开始收藏功能
-                if(movieId == 0) return;
+
                 ContentValues cv = new ContentValues();
-                cv.put(MovieContract.MovieEntry.COLUMN_ID, movieId);
-                cv.put(MovieContract.MovieEntry.COLUMN_NAME, mMovie.getTitle());
-                cv.put(MovieContract.MovieEntry.COLUMN_RELEASE_DATE, mMovie.getRelease_date());
-                cv.put(MovieContract.MovieEntry.COLUMN_POST_PATH, mMovie.getBackdrop_path());
-                Uri uri = getContext().getContentResolver().insert(MovieContract.MovieEntry.CONTENT_URI, cv);
+                cv.put(MovieContract.MovieEntry.COLUMN_FAVORITE, (finalIsFav == 1 ? 0 : 1));
+                // TODO: 2017/12/25 go on update it, please
+                Uri uri = getContext().getContentResolver().update(MovieContract.MovieEntry.CONTENT_URI,cv);
                 if (uri != null){
                     Toast.makeText(getContext(),"Added to Favorite!",Toast.LENGTH_SHORT).show();
                 }

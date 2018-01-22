@@ -84,7 +84,7 @@ public class DetailPagerActivity extends AppCompatActivity {
             @Override
             public Fragment getItem(int position) {
                 Movie movie = mMovieList.get(position);
-                return DetailFragment.newInstance(movie);
+                return DetailFragment.newInstance(movie);//这里是： DetailPagerActivity和DetailFragment发生联系的 地方。
             }
 
             @Override

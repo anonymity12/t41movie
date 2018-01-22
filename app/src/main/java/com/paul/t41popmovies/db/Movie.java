@@ -46,7 +46,6 @@ public class Movie implements Parcelable{
     private byte favorite;
 
 
-    private String[] reviews;
     private String original_language;
     private String original_title;
     private String backdrop_path;//背景图
@@ -71,7 +70,6 @@ public class Movie implements Parcelable{
         parcel.writeString(poster_path);
         parcel.writeString(trailer);
         parcel.writeByte(favorite);
-        parcel.writeStringArray(reviews);
         parcel.writeString(original_language);
         parcel.writeString(original_title);
         parcel.writeString(backdrop_path);
@@ -232,14 +230,14 @@ public class Movie implements Parcelable{
     public void setTrailer(String trailer) {
         this.trailer = trailer;
     }
-
-    public String[] getReviews() {
-        return reviews;
-    }
-
-    public void setReviews(String[] reviews) {
-        this.reviews = reviews;
-    }
+//因为删除了review部分，所以以下无用。
+//    public String[] getReviews() {
+//        return reviews;
+//    }
+//
+//    public void setReviews(String[] reviews) {
+//        this.reviews = reviews;
+//    }
 
     public byte getFavorite() {
         return favorite;

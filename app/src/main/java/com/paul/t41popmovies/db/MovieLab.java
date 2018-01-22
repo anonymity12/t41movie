@@ -61,7 +61,7 @@ public class MovieLab {
 
     /*
     * 删除（清空原有数据）和插入数据ContentProvider，此方法在网络请求结束的时刻，由网络请求结束接口 调用
-    *
+    *  2017/12/14 15:45 tt 建议 ：如果在这里（电影对象的数据同步上出了问题，请考虑参考Sunshine的synchronized public static void syncWeather(Context context){...}@Sync包内
     * */
     public void syncMovies(ContentValues[] contentValues){
         if (contentValues != null && contentValues.length != 0){
@@ -77,11 +77,16 @@ public class MovieLab {
 
     }
 
+    //
     public void setMovieList(List<Movie> movieList) {
         mMovieList = movieList;
     }
 
+    /*
+    * 从db查询，得到一个movie list
+    * */
     public List<Movie> getMovieList() {
+
 
         return mMovieList;
     }
